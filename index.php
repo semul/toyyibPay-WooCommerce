@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: toyyibPay for WooCommerce
+ * Plugin Name: toyyibPay for WooCommerce inject
  * Plugin URI: https://wordpress.org/plugins/toyyibpay-for-woocommerce/#installation
  * Description: Integrate your WooCommerce site with toyyibPay Payment Gateway.
- * Version: 1.3.1
+ * Version: 1.3.2
  * Author: toyyibPay
  * Author URI: https://toyyibpay.com
  * tested up to: 5.5.2
