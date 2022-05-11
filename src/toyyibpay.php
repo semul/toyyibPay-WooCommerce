@@ -467,7 +467,7 @@ class toyyibpay extends WC_Payment_Gateway
 								echo 'OK';
 							} else {
 								wp_redirect(wc_get_checkout_url());
-								wc_add_notice('Payment was declined<br>Reason: Bank error / insuficient fund', 'error');
+								wc_add_notice('Payment was declined<br>Reason: Bank error / insuficient fund - response', 'error');
 							}
 							exit();
 						}
