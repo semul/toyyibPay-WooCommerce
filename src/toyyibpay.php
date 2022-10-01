@@ -260,7 +260,7 @@ class toyyibpay extends WC_Payment_Gateway
 		$arr 		= json_decode($response, true);
 		
 		if($order->get_status() == "pending" && $arr[0]["billpaymentStatus"] == "1"){
-			$order->payment_complete();
+			$order->payment_complete($billCode);
 			$order->add_order_note('Payment successfully made via toyyibPay :)<br> 
 			Ref. No: '. $arr[0]["billpaymentInvoiceNo"].'
 			<br>Bill Code: '. $billCode .'
@@ -428,6 +428,7 @@ class toyyibpay extends WC_Payment_Gateway
 			$order = wc_get_order($_REQUEST['order_id']);
 			$old_wc = version_compare(WC_VERSION, '3.0', '<');
 			$order_id = $old_wc ? $order->id : $order->get_id();
+			$billCode = $_REQUEST['billcode'];
 
 			if ($order && $order_id != 0) {
 
@@ -438,9 +439,9 @@ class toyyibpay extends WC_Payment_Gateway
 							if (strtolower($order->get_status()) == 'cancelled' || strtolower($order->get_status()) == 'pending') {
 								$order->add_order_note('Payment is successfully made through toyyibPay!<br> 
 								Ref. No: '. $_REQUEST['transaction_id'].'
-								<br>Bill Code: '. $_REQUEST['billcode'] .'
+								<br>Bill Code: '. $billCode .'
                                 <br>Order ID: '. $order_id);
-                                $order->payment_complete();
+                                $order->payment_complete($billCode);
 							}
 
 							if ($is_callback) {
@@ -458,7 +459,7 @@ class toyyibpay extends WC_Payment_Gateway
 							if (strtolower($order->get_status()) == 'cancelled' || strtolower($order->get_status()) == 'pending') {
 								$order->add_order_note('Payment attempt was failed.<br> 
 								Ref. No: '. $_REQUEST['transaction_id'].'
-								<br>Bill Code: '. $_REQUEST['billcode'] .'
+								<br>Bill Code: '. $billCode .'
 								<br>Order ID: '. $order_id .'
 								<br>Reason: '. $_REQUEST['reason']);
 							}
@@ -528,24 +529,26 @@ class toyyibpay extends WC_Payment_Gateway
 
 	public function check_toyyibpay_callback()
 	{
-		if (isset($_REQUEST['status']) && isset($_POST['billcode']) && isset($_REQUEST['order_id']) && isset($_REQUEST['reason']) && isset($_REQUEST['refno'])) {
+		if (isset($_REQUEST['status']) && isset($_REQUEST['billcode']) && isset($_REQUEST['order_id']) && isset($_REQUEST['reason']) && isset($_REQUEST['refno'])) {
 
 			global $woocommerce;
+
 			$is_callback = isset($_POST['order_id']) ? true : false;
 			$order = wc_get_order($_REQUEST['order_id']);
 			$old_wc = version_compare(WC_VERSION, '3.0', '<');
 			$order_id = $old_wc ? $order->id : $order->get_id();
-			if ($order && $order_id != 0) {
+			$billCode = $_REQUEST['billcode'];
 
+			if ($order && $order_id != 0) {
 					if ($_REQUEST['status'] == 1 || $_REQUEST['status'] == '1') {
 						if (strtolower($order->get_status()) == 'pending' || strtolower($order->get_status()) == 'processing') {
 							# only update if order is pending
 							if (strtolower($order->get_status()) == 'pending') {
 								$order->add_order_note('Payment is successfully made through toyyibPay!<br> 
 								Ref. No: '. $_REQUEST['refno'].'
-								<br>Bill Code: '. $_REQUEST['billcode'] .'
+								<br>Bill Code: '. $billCode .'
                                 <br>Order ID: '. $order_id);
-                                $order->payment_complete();
+                                $order->payment_complete($billCode);
 
 							}
 
@@ -564,7 +567,7 @@ class toyyibpay extends WC_Payment_Gateway
 							if (strtolower($order->get_status()) == 'pending') {
 								$order->add_order_note('Payment attempt was failed.<br> 
 								Ref. No: '. $_REQUEST['transaction_id'].'
-								<br>Bill Code: '. $_REQUEST['billcode'] .'
+								<br>Bill Code: '. $billCode .'
 								<br>Order ID: '. $order_id .'
 								<br>Reason: '. $_REQUEST['reason']);
 							}
@@ -579,7 +582,7 @@ class toyyibpay extends WC_Payment_Gateway
 								}
 								$post_check = array(
 									'body' => array(
-										'billCode' 			=> $_REQUEST['billcode'],
+										'billCode' 			=> $billCode,
 										'billpaymentStatus' => '1'
 									)
                                 );
@@ -590,10 +593,10 @@ class toyyibpay extends WC_Payment_Gateway
 								$billpaymentStatus = $arrCheck[0]['billpaymentStatus'];
 
 								if ($billpaymentStatus == 1 || $billpaymentStatus == "1") {
-									$order->payment_complete();
+									$order->payment_complete($billCode);
 									$order->add_order_note('Payment successfully made through toyyibPay!<br> 
 									Ref. No: '. $_REQUEST['transaction_id'].'
-									<br>Bill Code: '. $_REQUEST['billcode'] .'
+									<br>Bill Code: '. $billCode .'
 									<br>Order ID: '. $order_id);
 
 									if ($is_callback) {
@@ -609,7 +612,7 @@ class toyyibpay extends WC_Payment_Gateway
                                         if (strtolower($order->get_status()) == 'pending') {
                                             $order->add_order_note('Payment attempt was failed.<br> 
                                             Ref. No: '. $_REQUEST['transaction_id'].'
-                                            <br>Bill Code: '. $_REQUEST['billcode'] .'
+                                            <br>Bill Code: '. $billCode .'
                                             <br>Order ID: '. $order_id .'
                                             <br>Reason: '. $_REQUEST['reason']);
                                         }
@@ -629,7 +632,7 @@ class toyyibpay extends WC_Payment_Gateway
                                         if (strtolower($order->get_status()) == 'pending') {
                                             $order->add_order_note('Payment status pending. Please check in your toyyibPay account for the latest status.<br> 
                                             Ref. No: '. $_REQUEST['transaction_id'].'
-                                            <br>Bill Code: '. $_REQUEST['billcode'] .'
+                                            <br>Bill Code: '. $billCode .'
                                             <br>Order ID: '. $order_id .'
                                             <br>Reason: '. $_REQUEST['reason']);
                                         }
